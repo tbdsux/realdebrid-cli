@@ -16,12 +16,12 @@ func (msg *ApiError) Error() string {
 }
 
 type RealDebridClient struct {
-	*req.Client
+	client *req.Client
 }
 
 func NewClient(apiKey string) *RealDebridClient {
 	return &RealDebridClient{
-		Client: req.C().
+		client: req.C().
 			SetCommonBearerAuthToken(apiKey).
 			SetBaseURL("https://api.real-debrid.com/rest/1.0/").
 			SetCommonErrorResult(&ApiError{}).

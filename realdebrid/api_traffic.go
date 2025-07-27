@@ -12,7 +12,7 @@ type Traffic = map[string]struct {
 
 func (c *RealDebridClient) GetTraffic() (*Traffic, error) {
 	var tr Traffic
-	resp, err := c.R().SetSuccessResult(&tr).Get("traffic")
+	resp, err := c.client.R().SetSuccessResult(&tr).Get("traffic")
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ type TrafficDetails = map[string]struct {
 
 func (c *RealDebridClient) GetTrafficDetails(start string, end string) (*TrafficDetails, error) {
 	var trd TrafficDetails
-	resp, err := c.R().SetSuccessResult(&trd).SetQueryParam("start", start).SetQueryParam("end", end).Get("traffic/details")
+	resp, err := c.client.R().SetSuccessResult(&trd).SetQueryParam("start", start).SetQueryParam("end", end).Get("traffic/details")
 	if err != nil {
 		return nil, err
 	}

@@ -15,7 +15,7 @@ type User struct {
 func (c *RealDebridClient) GetUser() (*User, error) {
 	var user User
 
-	resp, err := c.R().SetSuccessResult(&user).Get("user")
+	resp, err := c.client.R().SetSuccessResult(&user).Get("user")
 	if err != nil {
 		return nil, err
 	}
