@@ -12,6 +12,8 @@ type User struct {
 	Expiration string `json:"expiration"`
 }
 
+// GetUser retrieves the user's information.
+// `GET /user`
 func (c *RealDebridClient) GetUser() (*User, error) {
 	var user User
 

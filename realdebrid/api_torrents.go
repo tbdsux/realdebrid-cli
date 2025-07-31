@@ -61,6 +61,25 @@ func (c *RealDebridClient) GetTorrentsInfo(id string) (*TorrentInfo, error) {
 	return &output, nil
 }
 
+type TorrentsActiveCount struct {
+	NB    int64 `json:"nb"`
+	Limit int64 `json:"limit"`
+	List  any   `json:"list"` // List of active torrents, if any
+}
+
+// GetTorrentsActiveCount retrieves the number of active torrents and the limit.
+// `GET /torrents/activeCount`
+func (c *RealDebridClient) GetTorrentsActiveCount() (*TorrentsActiveCount, error) {
+	var output TorrentsActiveCount
+
+	resp, err := c.client.R().SetSuccessResult(&output).Get("torrents/activeCount")
+	if err != nil || !resp.IsSuccessState() {
+		return nil, resp.Err
+	}
+
+	return &output, nil
+}
+
 type TorrentAvailableHost struct {
 	Host        string `json:"host"`
 	MaxFileSize int64  `json:"max_file_size"`

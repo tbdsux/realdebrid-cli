@@ -10,6 +10,8 @@ type Traffic = map[string]struct {
 	Reset string `json:"reset"`
 }
 
+// GetTraffic retrieves the traffic limitations for limited hosters (limits, current usage, extra packages).
+// `GET /traffic`
 func (c *RealDebridClient) GetTraffic() (*Traffic, error) {
 	var tr Traffic
 	resp, err := c.client.R().SetSuccessResult(&tr).Get("traffic")
@@ -29,6 +31,9 @@ type TrafficDetails = map[string]struct {
 	Bytes int64            `json:"bytes"`
 }
 
+// GetTrafficDetails retrieves detailed traffic information on each hoster during a specified period.
+// The `start` and `end` parameters should be in ISO 8601 format (e.g., "2023-01-01T00:00:00Z").
+// `GET /traffic/details`
 func (c *RealDebridClient) GetTrafficDetails(start string, end string) (*TrafficDetails, error) {
 	var trd TrafficDetails
 	resp, err := c.client.R().SetSuccessResult(&trd).SetQueryParam("start", start).SetQueryParam("end", end).Get("traffic/details")
