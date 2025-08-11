@@ -91,14 +91,17 @@ func getTorrentInfo(rd *realdebrid.RealDebridClient, id string) {
 	fmt.Printf("Name: %s\n", torrent.Filename)
 	fmt.Printf("Size: %d bytes\n", torrent.Bytes)
 	fmt.Printf("Status: %s\n", torrent.Status)
-	fmt.Printf("Files: %d\n", len(torrent.Files))
+	fmt.Printf("Files:\n")
+	for _, v := range torrent.Files {
+		fmt.Printf(" - %d (%s)\n", v.ID, v.Path)
+	}
 }
 
 // UNCOMMENT SOME OF THE FUNCTIONS BELOW TO TEST THEM
 func main() {
 	rd := realdebrid.NewClient(os.Getenv("REALDEBRID_API_KEY"))
 
-	getTorrentInfo(rd, "LWNVJWV7J5SKE")
+	getTorrentInfo(rd, "W6Z5SYI5JG3ZA")
 
 	getAvailableHosts(rd)
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	initconfig "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/init_config"
 )
 
 var apiKey string
@@ -25,10 +26,29 @@ The config file will be created in the following path: $HOME/.realdebrid-cli.yam
 If the file already exists, it will not be overwritten.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		if apiKey == "" {
-			cmd.Help()
+		output, err := initconfig.AskConfigForSetup()
+
+		if err != nil {
+			cmd.PrintErr(err)
 			return
 		}
+
+		if output.Quitting {
+			// do nothing
+			return
+		}
+
+		if !output.Success {
+			fmt.Print("Unknown error has happened, should not happen!")
+			return
+		}
+
+		apiKey := output.TextInput.Value()
+		if apiKey == "" {
+			return
+		}
+
+		// Setup config
 
 		viper.Set("apiKey", apiKey)
 
@@ -62,6 +82,5 @@ If the file already exists, it will not be overwritten.
 func init() {
 	configCmd.AddCommand(initCmd)
 
-	initCmd.Flags().StringVar(&apiKey, "setApiKey", "", "Set the API key for the application")
 	initCmd.Flags().BoolVarP(&force, "force", "f", false, "Force overwrite the config file if it exists")
 }

@@ -8,7 +8,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/tbdsux/realdebrid-cli/rd/internal"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
@@ -18,10 +18,9 @@ var userCmd = &cobra.Command{
 	Short: "Show user information",
 	Long:  `View user information of the linked Real Debrid api key.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		apiKey := viper.GetString("apiKey")
-
-		if apiKey == "" {
-			cmd.PrintErr("API key is not set. Please run 'realdebrid-cli config init' to set it up.")
+		apiKey, err := internal.GetApiKey()
+		if err != nil {
+			cmd.PrintErrf("Error: %v\n", err)
 			return
 		}
 

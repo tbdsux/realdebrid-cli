@@ -12,7 +12,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var debug bool
+
 var CFG_FILE string = path.Join(os.Getenv("HOME"), ".realdebrid-cli.yaml")
+
+type commandErrMsg error
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -47,9 +51,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&CFG_FILE, "config", "", "config file (default is $HOME/.realdebrid-cli.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolVarP(&debug, "debug", "d", false, "Enable debug mode")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -72,7 +74,9 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-		fmt.Print("\n")
+		if debug {
+			fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+			fmt.Print("\n")
+		}
 	}
 }
