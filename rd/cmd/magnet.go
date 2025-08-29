@@ -1,26 +1,22 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
+	addMagnet "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/add_magnet"
 	uploadtorrent "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/upload_torrent"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
-var torrentFile string
-var autoSelectTorrent bool
+var autoSelectMagnet bool
 
-// torrentCmd represents the torrent command
-var torrentCmd = &cobra.Command{
-	Use:   "torrent",
+// magnetCmd represents the magnet command
+var magnetCmd = &cobra.Command{
+	Use:   "magnet",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -29,37 +25,33 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if torrentFile == "" {
-			return
-		}
-
-		if _, err := os.Stat(torrentFile); os.IsNotExist(err) {
-			fmt.Println("[e] Torrent file does not exist:", torrentFile)
-			return
-		}
-
-		if !strings.HasSuffix(torrentFile, ".torrent") {
-			fmt.Println("[e] Invalid torrent file format. Please provide a .torrent file.")
-			return
-		}
-
-		fmt.Println("[i] Torrent file provided:", torrentFile)
-
 		apiKey, err := internal.GetApiKey()
 		if err != nil {
-			cmd.PrintErrf("Error: %v\n", err)
+			cmd.PrintErrf("Error :%v", err)
+			return
+		}
+
+		inputMagnet, err := addMagnet.HandleAskMagnetLink()
+		if err != nil {
+			cmd.PrintErrf("Error: %v", err)
+			return
+		}
+
+		if inputMagnet.Quitting {
+			return
+		}
+
+		magnetLink := inputMagnet.Textarea.Value()
+		if magnetLink == "" {
+			// empty
 			return
 		}
 
 		rdClient := realdebrid.NewClient(apiKey)
 
-		output, err := uploadtorrent.HandleUploadTorrent(
-			torrentFile,
-			rdClient,
-		)
-
+		output, err := addMagnet.HandleUploadMagnetLink(magnetLink, rdClient)
 		if err != nil {
-			cmd.PrintErrf("Error: %v\n", err)
+			cmd.PrintErrf("Error: %v", err)
 			return
 		}
 
@@ -68,7 +60,7 @@ to quickly create a Cobra application.`,
 			t.SetOutputMirror(os.Stdout)
 
 			t.AppendHeader(table.Row{"#", "Torrent Information"})
-			t.AppendRow(table.Row{"File", output.TorrentFile})
+			t.AppendRow(table.Row{"Magnet Link", fmt.Sprintf("%s...", output.MagnetLink[:60])})
 			t.AppendRow(table.Row{"ID", output.Result.ID})
 			t.AppendRow(table.Row{"URI", output.Result.URI})
 
@@ -86,13 +78,12 @@ to quickly create a Cobra application.`,
 				return
 			}
 		}
+
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(torrentCmd)
+	rootCmd.AddCommand(magnetCmd)
 
-	torrentCmd.Flags().StringVarP(&torrentFile, "file", "f", "", "Path to the torrent file")
-	torrentCmd.Flags().BoolVarP(&autoSelectTorrent, "auto-select", "a", false, "Automatically selects all the files to start the torrent")
-	torrentCmd.MarkFlagRequired("file")
+	magnetCmd.Flags().BoolVarP(&autoSelectMagnet, "auto-select", "a", false, "Automatically selects all the files to start the torrent")
 }
