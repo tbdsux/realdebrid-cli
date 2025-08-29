@@ -44,6 +44,9 @@ func (m addMagnetModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.Textarea.Focused() {
 				m.Textarea.Blur()
 			}
+		case tea.KeyCtrlC:
+			m.Quitting = true
+			return m, tea.Quit
 		case tea.KeyEnter:
 			m.Success = true
 			return m, tea.Quit

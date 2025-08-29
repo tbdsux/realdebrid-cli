@@ -65,7 +65,7 @@ You will be asked to provide the magnet link on command usage.
 			t.Render()
 		}
 
-		if autoSelectTorrent {
+		if autoSelectMagnet {
 			fmt.Print("\n")
 
 			// Do auto select and start torrent
