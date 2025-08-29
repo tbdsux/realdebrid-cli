@@ -1,10 +1,7 @@
 # realdebrid-cli
 
-
 > [!NOTE]
 > On-going development.
-
-
 
 ## Usage
 
