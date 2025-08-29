@@ -3,10 +3,16 @@
 > [!NOTE]
 > On-going development.
 
+Manage your real-debrid account via a cli.
+
+```sh
+go install github.com/tbdsux/realdebrid-cli/rd@latest
+```
+
 ## Usage
 
 ```sh
-❯ go run rd/main.go
+❯ rd
 
 Real-Debrid CLI
 
@@ -31,3 +37,9 @@ Flags:
 Use "rd [command] --help" for more information about a command.
 
 ```
+
+## Development
+
+CLI uses [Bubble Tea](https://github.com/charmbracelet/bubbletea/) for power for the commands.
+
+> This is not a TUI app though.
