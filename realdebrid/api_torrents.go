@@ -3,6 +3,7 @@ package realdebrid
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -35,12 +36,35 @@ type TorrentInfo struct {
 	}
 }
 
+type GetTorrentsRequest struct {
+	Offset int    `json:"offset,omitempty"`
+	Limit  int    `json:"limit,omitempty"`
+	Page   int    `json:"page,omitempty"`
+	Filter string `json:"filter,omitempty"` // defaults to "active"
+}
+
 // GetTorrents retrieves the list of torrents of the user.
 // `GET /torrents`
-func (c *RealDebridClient) GetTorrents() ([]Torrent, error) {
+func (c *RealDebridClient) GetTorrents(req *GetTorrentsRequest) ([]Torrent, error) {
+	params := map[string]string{
+		"filter": "active",
+	}
+	if req.Offset != 0 {
+		params["offset"] = fmt.Sprint(req.Offset)
+	}
+	if req.Limit != 0 {
+		params["limit"] = fmt.Sprint(req.Limit)
+	}
+	if req.Page != 0 {
+		params["page"] = fmt.Sprint(req.Page)
+	}
+	if req.Filter != "" {
+		params["filter"] = req.Filter
+	}
+
 	var output []Torrent
 
-	resp, err := c.client.R().SetSuccessResult(&output).Get("torrents")
+	resp, err := c.client.R().SetSuccessResult(&output).SetQueryParams(params).Get("torrents")
 	if err != nil || !resp.IsSuccessState() {
 		return nil, resp.Err
 	}

@@ -17,7 +17,7 @@ var autoSelectTorrent bool
 
 // torrentCmd represents the torrent command
 var torrentCmd = &cobra.Command{
-	Use:   "torrent",
+	Use:   "upload-torrent",
 	Short: "Upload a torrent file",
 	Long: `Upload a torrent file
 

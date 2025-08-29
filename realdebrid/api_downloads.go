@@ -23,7 +23,6 @@ type GetDownloadRequest struct {
 // GetDownloads gets the user's downloads list.
 // `GET /downloads`
 func (c *RealDebridClient) GetDownloads(req *GetDownloadRequest) ([]Download, error) {
-	var downloads []Download
 
 	params := make(map[string]string)
 	if req.Offset != 0 {
@@ -35,6 +34,8 @@ func (c *RealDebridClient) GetDownloads(req *GetDownloadRequest) ([]Download, er
 	if req.Page != 0 {
 		params["page"] = fmt.Sprint(req.Page)
 	}
+
+	var downloads []Download
 
 	resp, err := c.client.R().SetSuccessResult(&downloads).SetQueryParams(params).Get("downloads")
 	if err != nil || !resp.IsSuccessState() {

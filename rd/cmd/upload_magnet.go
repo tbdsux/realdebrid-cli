@@ -15,7 +15,7 @@ import (
 var autoSelectMagnet bool
 
 var magnetCmd = &cobra.Command{
-	Use:   "magnet",
+	Use:   "upload-magnet",
 	Short: "Upload a magnet link",
 	Long: `Upload a torrent magnet link
 

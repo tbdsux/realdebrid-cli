@@ -15,7 +15,6 @@ var CFG_FILE string = path.Join(os.Getenv("HOME"), ".realdebrid-cli.yaml")
 
 type commandErrMsg error
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rd",
 	Short: "Real-Debrid CLI",
