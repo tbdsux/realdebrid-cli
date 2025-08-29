@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -13,7 +10,6 @@ import (
 	initconfig "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/init_config"
 )
 
-var apiKey string
 var force bool
 
 var initCmd = &cobra.Command{
