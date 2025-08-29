@@ -14,16 +14,13 @@ import (
 
 var autoSelectMagnet bool
 
-// magnetCmd represents the magnet command
 var magnetCmd = &cobra.Command{
 	Use:   "magnet",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Upload a magnet link",
+	Long: `Upload a torrent magnet link
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+You will be asked to provide the magnet link on command usage.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		apiKey, err := internal.GetApiKey()
 		if err != nil {

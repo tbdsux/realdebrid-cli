@@ -16,7 +16,6 @@ import (
 var apiKey string
 var force bool
 
-// initCmd represents the create command
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Creates a new configuration file",
@@ -56,12 +55,9 @@ If the file already exists, it will not be overwritten.
 
 		fmt.Println("Creating config file at:", cfgFile)
 
-		if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
-			if err := viper.WriteConfigAs(cfgFile); err != nil {
-				cmd.PrintErrf("Error writing config file: %v\n", err)
-				return
-			}
-		}
+		// Check if config file exists
+		_, err = os.Stat(cfgFile)
+		configDoesNotExist := os.IsNotExist(err)
 
 		if force {
 			if err := viper.WriteConfigAs(cfgFile); err != nil {
@@ -69,6 +65,15 @@ If the file already exists, it will not be overwritten.
 				return
 			}
 		} else {
+			if configDoesNotExist {
+				if err := viper.WriteConfigAs(cfgFile); err != nil {
+					cmd.PrintErrf("Error writing config file: %v\n", err)
+					return
+				}
+
+				return
+			}
+
 			if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
 				cmd.PrintErrf("Error writing config file: %v\n", err)
 				return

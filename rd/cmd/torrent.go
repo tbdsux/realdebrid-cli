@@ -21,13 +21,11 @@ var autoSelectTorrent bool
 // torrentCmd represents the torrent command
 var torrentCmd = &cobra.Command{
 	Use:   "torrent",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Upload a torrent file",
+	Long: `Upload a torrent file
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Select torrent file and upload to be downloaded later on.
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if torrentFile == "" {
 			return

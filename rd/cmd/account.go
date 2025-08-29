@@ -12,11 +12,10 @@ import (
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
-// userCmd represents the user command
-var userCmd = &cobra.Command{
-	Use:   "user",
-	Short: "Show user information",
-	Long:  `View user information of the linked Real Debrid api key.`,
+var accountCmd = &cobra.Command{
+	Use:   "account",
+	Short: "Show account information",
+	Long:  `View account information of the linked Real Debrid api key.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		apiKey, err := internal.GetApiKey()
 		if err != nil {
@@ -52,7 +51,7 @@ var userCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(userCmd)
+	rootCmd.AddCommand(accountCmd)
 
 	// Here you will define your flags and configuration settings.
 
