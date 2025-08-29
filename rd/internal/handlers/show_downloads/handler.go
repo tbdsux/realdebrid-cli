@@ -13,7 +13,7 @@ import (
 var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type item struct {
-	title, desc string
+	title, desc, id string
 }
 
 func (i item) Title() string       { return i.title }
@@ -22,6 +22,8 @@ func (i item) FilterValue() string { return i.title }
 
 type showModel struct {
 	list list.Model
+
+	Choice item
 }
 
 func (m showModel) Init() tea.Cmd {
@@ -31,9 +33,18 @@ func (m showModel) Init() tea.Cmd {
 func (m showModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		if msg.Type == tea.KeyCtrlC {
+		switch msg.Type {
+		case tea.KeyCtrlC:
+			return m, tea.Quit
+
+		case tea.KeyEnter:
+			i, ok := m.list.SelectedItem().(item)
+			if ok {
+				m.Choice = i
+			}
 			return m, tea.Quit
 		}
+
 	case tea.WindowSizeMsg:
 		h, v := docStyle.GetFrameSize()
 		m.list.SetSize(msg.Width-h, msg.Height-v)
@@ -48,13 +59,14 @@ func (m showModel) View() string {
 	return docStyle.Render(m.list.View())
 }
 
-func ShowDownloadsList(dls []realdebrid.Download) error {
+func ShowDownloadsList(dls []realdebrid.Download) (*realdebrid.Download, error) {
 	var items []list.Item
 
 	for _, i := range dls {
 		items = append(items, item{
 			title: i.Filename,
 			desc:  fmt.Sprintf("ID: %s\tSize: %s\t", i.ID, internal.ByteCountSI(i.FileSize)),
+			id:    i.ID,
 		})
 	}
 
@@ -63,9 +75,20 @@ func ShowDownloadsList(dls []realdebrid.Download) error {
 
 	p := tea.NewProgram(m, tea.WithAltScreen())
 
-	if _, err := p.Run(); err != nil {
-		return err
+	model, err := p.Run()
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	output := model.(showModel)
+
+	// Filter result selected
+	var selected realdebrid.Download
+	for _, v := range dls {
+		if v.ID == output.Choice.id {
+			selected = v
+		}
+	}
+
+	return &selected, nil
 }
