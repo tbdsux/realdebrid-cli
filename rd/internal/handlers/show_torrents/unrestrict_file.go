@@ -94,7 +94,7 @@ func (m unrestrictFileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.err = msg.err
 
 		if msg.success {
-			m.message = fmt.Sprintf("Download initialize complete: %s", msg.result.ID)
+			m.message = fmt.Sprintf("Download initialize complete: %s", msg.result.Filename)
 			m.Result = msg.result
 		} else {
 			m.message = fmt.Sprintf("Error download init: %v", msg.err)

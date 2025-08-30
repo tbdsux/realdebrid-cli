@@ -7,6 +7,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"github.com/tbdsux/realdebrid-cli/rd/cmd/shared"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
 	uploadtorrent "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/upload_torrent"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
@@ -14,6 +15,7 @@ import (
 
 var torrentFile string
 var noAutoSelectTorrent bool
+var doTorrentDL bool
 
 // torrentCmd represents the torrent command
 var torrentCmd = &cobra.Command{
@@ -62,7 +64,7 @@ Select torrent file and upload to be downloaded later on.
 			t := table.NewWriter()
 			t.SetOutputMirror(os.Stdout)
 
-			t.AppendHeader(table.Row{"#", "Torrent Information"})
+			t.AppendHeader(table.Row{"#", "Upload Details"})
 			t.AppendRow(table.Row{"File", output.TorrentFile})
 			t.AppendRow(table.Row{"ID", output.Result.ID})
 			t.AppendRow(table.Row{"URI", output.Result.URI})
@@ -83,6 +85,21 @@ Select torrent file and upload to be downloaded later on.
 			cmd.PrintErrf("Error: %v\n", err)
 			return
 		}
+
+		if !doTorrentDL {
+			return
+		}
+
+		fmt.Print("\n\n\n")
+
+		// Get torrent
+		torrent, err := rdClient.GetTorrentsInfo(output.Result.ID)
+		if err != nil {
+			cmd.PrintErrf("Error: %v\n", err)
+			return
+		}
+
+		shared.TorrentDownload(*torrent.Torrent, rdClient, cmd)
 	},
 }
 
@@ -90,6 +107,7 @@ func init() {
 	rootCmd.AddCommand(torrentCmd)
 
 	torrentCmd.Flags().StringVarP(&torrentFile, "file", "f", "", "Path to the torrent file")
+	torrentCmd.Flags().BoolVar(&doTorrentDL, "download", false, "Try to download once upload is complete")
 	torrentCmd.Flags().BoolVar(&noAutoSelectTorrent, "no-autoselect", false, "Disables auto selection of files once uploaded")
 	torrentCmd.MarkFlagRequired("file")
 }

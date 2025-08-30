@@ -6,6 +6,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
+	"github.com/tbdsux/realdebrid-cli/rd/cmd/shared"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
 	addMagnet "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/add_magnet"
 	uploadtorrent "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/upload_torrent"
@@ -13,6 +14,7 @@ import (
 )
 
 var noAutoSelectMagnet bool
+var doMagnetDL bool
 
 var magnetCmd = &cobra.Command{
 	Use:   "upload-magnet",
@@ -56,7 +58,7 @@ You will be asked to provide the magnet link on command usage.
 			t := table.NewWriter()
 			t.SetOutputMirror(os.Stdout)
 
-			t.AppendHeader(table.Row{"#", "Torrent Information"})
+			t.AppendHeader(table.Row{"#", "Upload Details"})
 			t.AppendRow(table.Row{"Magnet Link", fmt.Sprintf("%s...", output.MagnetLink[:60])})
 			t.AppendRow(table.Row{"ID", output.Result.ID})
 			t.AppendRow(table.Row{"URI", output.Result.URI})
@@ -77,6 +79,21 @@ You will be asked to provide the magnet link on command usage.
 			cmd.PrintErrf("Error: %v\n", err)
 			return
 		}
+
+		if !doMagnetDL {
+			return
+		}
+
+		fmt.Print("\n\n\n")
+
+		// Get torrent
+		torrent, err := rdClient.GetTorrentsInfo(output.Result.ID)
+		if err != nil {
+			cmd.PrintErrf("Error: %v\n", err)
+			return
+		}
+
+		shared.TorrentDownload(*torrent.Torrent, rdClient, cmd)
 	},
 }
 
@@ -84,4 +101,5 @@ func init() {
 	rootCmd.AddCommand(magnetCmd)
 
 	magnetCmd.Flags().BoolVar(&noAutoSelectMagnet, "no-autoselect", false, "Disables auto selection of files once uploaded")
+	magnetCmd.Flags().BoolVar(&doMagnetDL, "download", false, "Try to download once upload is complete")
 }
