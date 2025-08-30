@@ -12,7 +12,7 @@ import (
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
-var autoSelectMagnet bool
+var noAutoSelectMagnet bool
 
 var magnetCmd = &cobra.Command{
 	Use:   "upload-magnet",
@@ -65,22 +65,23 @@ You will be asked to provide the magnet link on command usage.
 			t.Render()
 		}
 
-		if autoSelectMagnet {
-			fmt.Print("\n")
-
-			// Do auto select and start torrent
-
-			if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
-				cmd.PrintErrf("Error: %v\n", err)
-				return
-			}
+		if noAutoSelectMagnet {
+			return
 		}
 
+		fmt.Print("\n")
+
+		// Do auto select and start torrent
+
+		if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
+			cmd.PrintErrf("Error: %v\n", err)
+			return
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(magnetCmd)
 
-	magnetCmd.Flags().BoolVarP(&autoSelectMagnet, "auto-select", "a", false, "Automatically selects all the files to start the torrent")
+	magnetCmd.Flags().BoolVar(&noAutoSelectMagnet, "no-autoselect", false, "Disables auto selection of files once uploaded")
 }

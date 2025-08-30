@@ -61,6 +61,7 @@ automatically be downloaded, set '--no-download' otherwise.
 			{"ID", selected.ID},
 			{"Filename", selected.Filename},
 			{"Size", internal.ByteCountSI(selected.Bytes)},
+			{"Status", selected.Status},
 			{"Date Added", selected.Added},
 		})
 		t.SetStyle(table.StyleLight)
@@ -73,6 +74,7 @@ automatically be downloaded, set '--no-download' otherwise.
 
 		if len(selected.Links) == 0 {
 			// expect > 1
+			fmt.Println(" :: Empty links, selected cannot be downloaded yet.")
 			return
 		}
 

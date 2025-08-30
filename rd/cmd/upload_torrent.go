@@ -13,7 +13,7 @@ import (
 )
 
 var torrentFile string
-var autoSelectTorrent bool
+var noAutoSelectTorrent bool
 
 // torrentCmd represents the torrent command
 var torrentCmd = &cobra.Command{
@@ -71,15 +71,17 @@ Select torrent file and upload to be downloaded later on.
 			t.Render()
 		}
 
-		if autoSelectTorrent {
-			fmt.Print("\n")
+		if noAutoSelectTorrent {
+			return
+		}
 
-			// Do auto select and start torrent
+		fmt.Print("\n")
 
-			if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
-				cmd.PrintErrf("Error: %v\n", err)
-				return
-			}
+		// Do auto select and start torrent
+
+		if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
+			cmd.PrintErrf("Error: %v\n", err)
+			return
 		}
 	},
 }
@@ -88,6 +90,6 @@ func init() {
 	rootCmd.AddCommand(torrentCmd)
 
 	torrentCmd.Flags().StringVarP(&torrentFile, "file", "f", "", "Path to the torrent file")
-	torrentCmd.Flags().BoolVarP(&autoSelectTorrent, "auto-select", "a", false, "Automatically selects all the files to start the torrent")
+	torrentCmd.Flags().BoolVar(&noAutoSelectTorrent, "no-autoselect", false, "Disables auto selection of files once uploaded")
 	torrentCmd.MarkFlagRequired("file")
 }
