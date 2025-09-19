@@ -23,7 +23,8 @@ func (i item) FilterValue() string { return i.title }
 type showModel struct {
 	list list.Model
 
-	Choice item
+	IsQuitting bool
+	Choice     item
 }
 
 func (m showModel) Init() tea.Cmd {
@@ -35,6 +36,7 @@ func (m showModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC:
+			m.IsQuitting = true
 			return m, tea.Quit
 
 		case tea.KeyEnter:
@@ -81,6 +83,10 @@ func ShowDownloadsList(dls []realdebrid.Download) (*realdebrid.Download, error) 
 	}
 
 	output := model.(showModel)
+
+	if output.IsQuitting {
+		return nil, nil
+	}
 
 	// Filter result selected
 	var selected realdebrid.Download

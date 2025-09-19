@@ -45,6 +45,10 @@ automatically be downloaded, set '--no-download' otherwise.
 			return
 		}
 
+		if selected == nil {
+			return
+		}
+
 		shared.TorrentDownload(*selected, rdClient, cmd)
 	},
 }

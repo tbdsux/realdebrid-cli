@@ -47,6 +47,10 @@ automatically be downloaded, set '--no-download' otherwise.
 			return
 		}
 
+		if selected == nil {
+			return
+		}
+
 		// Show table file info
 		t := table.NewWriter()
 		t.SetOutputMirror(os.Stdout)
