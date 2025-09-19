@@ -39,6 +39,25 @@ func TorrentDownload(torrent realdebrid.Torrent, rdClient *realdebrid.RealDebrid
 		fmt.Printf(" ::> Queueing %d files\n\n", len(torrent.Links))
 	}
 
+	dirPath := ""
+	if len(torrent.Links) > 1 {
+		// Create directory for torrent files
+		dirPath = torrent.Filename
+		info, err := os.Stat(dirPath)
+		if os.IsNotExist(err) {
+			// Directory does not exist, create it
+			if err := os.Mkdir(dirPath, 0755); err != nil {
+				cmd.PrintErrf("Error creating directory: %v\n", err)
+				return
+			}
+		} else {
+			if !info.IsDir() {
+				cmd.PrintErrf("Error: A file with the name '%s' already exists and is not a directory.\n", dirPath)
+				return
+			}
+		}
+	}
+
 	for _, item := range torrent.Links {
 		// Unrestrict torrent file
 		unrestrict, err := showTorrents.HandleUnrestrictFileLink(item, rdClient)
@@ -68,9 +87,16 @@ func TorrentDownload(torrent realdebrid.Torrent, rdClient *realdebrid.RealDebrid
 		// Start downloading
 		fmt.Println("\n  Downloading ::", unrestrict.Result.Filename)
 
+		// Combine dir path and filename
+		// cwd := os.Getwd()
+		finalFilename := unrestrict.Result.Filename
+		if dirPath != "" {
+			finalFilename = fmt.Sprintf("%s/%s", dirPath, unrestrict.Result.Filename)
+		}
+
 		output, err := showDownloads.DoDownloadFile(realdebrid.Download{
 			ID:       unrestrict.Result.ID,
-			Filename: unrestrict.Result.Filename,
+			Filename: finalFilename,
 			Download: unrestrict.Result.Download,
 		})
 		if err != nil {
