@@ -1,4 +1,4 @@
-package showTorrents
+package handlers
 
 import (
 	"fmt"
@@ -9,15 +9,13 @@ import (
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
-type commandErrMsg error
-
-type unrestrictFileMsg struct {
+type uploadMagnetMsg struct {
 	success bool
-	result  *realdebrid.UnrestrictedLink
+	result  *realdebrid.AddTorrent
 	err     error
 }
 
-type unrestrictFileModel struct {
+type uploadMagnetModel struct {
 	spinner spinner.Model
 	err     error
 	message string
@@ -26,53 +24,51 @@ type unrestrictFileModel struct {
 	Quitting bool
 	TaskDone bool
 
-	Result *realdebrid.UnrestrictedLink
+	Result *realdebrid.AddTorrent
 
-	Link string
+	MagnetLink string
 
 	rd *realdebrid.RealDebridClient
 }
 
-func (m unrestrictFileModel) doUnrestrictFile() tea.Msg {
-	res, err := m.rd.UnrestricLink(&realdebrid.UnrestrictProps{
-		Link: m.Link,
-	})
+func (m uploadMagnetModel) doUploadMagnet() tea.Msg {
+	res, err := m.rd.AddMagnet(m.MagnetLink)
 	if err != nil {
-		return unrestrictFileMsg{
+		return uploadMagnetMsg{
 			success: false,
 			result:  nil,
 			err:     err,
 		}
 	}
 
-	return unrestrictFileMsg{
+	return uploadMagnetMsg{
 		success: true,
 		result:  res,
 		err:     nil,
 	}
 }
 
-func initialUnrestrictFileModel(link string, rd *realdebrid.RealDebridClient) unrestrictFileModel {
+func initialUploadMagnetModel(magnetLink string, rd *realdebrid.RealDebridClient) uploadMagnetModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
-	return unrestrictFileModel{
-		spinner: s,
-		Link:    link,
-		Loading: true,
-		rd:      rd,
-		message: "Initializing file download...",
+	return uploadMagnetModel{
+		spinner:    s,
+		MagnetLink: magnetLink,
+		Loading:    true,
+		rd:         rd,
+		message:    "Uploading magnet link...",
 	}
 }
 
-func (m unrestrictFileModel) Init() tea.Cmd {
-	return tea.Batch(m.doUnrestrictFile,
+func (m uploadMagnetModel) Init() tea.Cmd {
+	return tea.Batch(m.doUploadMagnet,
 		m.spinner.Tick,
 	)
 }
 
-func (m unrestrictFileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m uploadMagnetModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -88,16 +84,16 @@ func (m unrestrictFileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Quitting = true
 		return m, nil
 
-	case unrestrictFileMsg:
+	case uploadMagnetMsg:
 		m.Loading = false
 		m.TaskDone = true
 		m.err = msg.err
 
 		if msg.success {
-			m.message = fmt.Sprintf("Download initialize complete: %s", msg.result.Filename)
+			m.message = fmt.Sprintf("Magnet link uploaded successfully: %s", msg.result.ID)
 			m.Result = msg.result
 		} else {
-			m.message = fmt.Sprintf("Error download init: %v", msg.err)
+			m.message = fmt.Sprintf("Error uploading magnet link: %v", msg.err)
 
 		}
 
@@ -111,7 +107,7 @@ func (m unrestrictFileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 }
 
-func (m unrestrictFileModel) View() string {
+func (m uploadMagnetModel) View() string {
 	if m.Quitting {
 		return ""
 	}
@@ -138,14 +134,14 @@ func (m unrestrictFileModel) View() string {
 	return output
 }
 
-func HandleUnrestrictFileLink(link string, rd *realdebrid.RealDebridClient) (*unrestrictFileModel, error) {
-	p := tea.NewProgram(initialUnrestrictFileModel(link, rd))
+func HandleUploadMagnetLink(magnetLink string, rd *realdebrid.RealDebridClient) (*uploadMagnetModel, error) {
+	p := tea.NewProgram(initialUploadMagnetModel(magnetLink, rd))
 	r, err := p.Run()
 	if err != nil {
 		return nil, fmt.Errorf("Error running program: %v", err)
 	}
 
-	output := r.(unrestrictFileModel)
+	output := r.(uploadMagnetModel)
 	if output.err != nil {
 		return nil, fmt.Errorf("Error: %v", output.err)
 	}

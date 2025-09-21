@@ -1,4 +1,4 @@
-package showDownloads
+package handlers
 
 import (
 	"fmt"

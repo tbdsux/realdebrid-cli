@@ -1,4 +1,4 @@
-package uploadtorrent
+package handlers
 
 import (
 	"fmt"
@@ -9,7 +9,13 @@ import (
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
-type autoSelectTorrentModel struct {
+type unrestrictFileMsg struct {
+	success bool
+	result  *realdebrid.UnrestrictedLink
+	err     error
+}
+
+type unrestrictFileModel struct {
 	spinner spinner.Model
 	err     error
 	message string
@@ -18,55 +24,53 @@ type autoSelectTorrentModel struct {
 	Quitting bool
 	TaskDone bool
 
-	Result bool
+	Result *realdebrid.UnrestrictedLink
 
-	TorrentId string
-	rd        *realdebrid.RealDebridClient
+	Link string
+
+	rd *realdebrid.RealDebridClient
 }
 
-type autoSelectRes struct {
-	success bool
-	err     error
-}
-
-func (m autoSelectTorrentModel) doAutoSelectTorrent() tea.Msg {
-	err := m.rd.SelectTorrentFiles(m.TorrentId, []string{})
+func (m unrestrictFileModel) doUnrestrictFile() tea.Msg {
+	res, err := m.rd.UnrestricLink(&realdebrid.UnrestrictProps{
+		Link: m.Link,
+	})
 	if err != nil {
-		return autoSelectRes{
+		return unrestrictFileMsg{
 			success: false,
+			result:  nil,
 			err:     err,
 		}
 	}
 
-	return autoSelectRes{
+	return unrestrictFileMsg{
 		success: true,
+		result:  res,
 		err:     nil,
 	}
-
 }
 
-func initialAutoSelectTorrent(torrentId string, rd *realdebrid.RealDebridClient) autoSelectTorrentModel {
+func initialUnrestrictFileModel(link string, rd *realdebrid.RealDebridClient) unrestrictFileModel {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-	s.Style = s.Style.Foreground(lipgloss.Color("205"))
+	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
-	return autoSelectTorrentModel{
-		spinner:   s,
-		Loading:   true,
-		TorrentId: torrentId,
-		rd:        rd,
-		message:   "Auto selecting torrent files...",
+	return unrestrictFileModel{
+		spinner: s,
+		Link:    link,
+		Loading: true,
+		rd:      rd,
+		message: "Initializing file download...",
 	}
 }
 
-func (m autoSelectTorrentModel) Init() tea.Cmd {
-	return tea.Batch(
-		m.doAutoSelectTorrent,
+func (m unrestrictFileModel) Init() tea.Cmd {
+	return tea.Batch(m.doUnrestrictFile,
 		m.spinner.Tick,
 	)
 }
 
-func (m autoSelectTorrentModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m unrestrictFileModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -79,30 +83,33 @@ func (m autoSelectTorrentModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case commandErrMsg:
 		m.err = msg
+		m.Quitting = true
 		return m, nil
 
-	case autoSelectRes:
+	case unrestrictFileMsg:
 		m.Loading = false
 		m.TaskDone = true
 		m.err = msg.err
 
 		if msg.success {
-			m.message = "Auto selected files successfully"
-			m.Result = true
+			m.message = fmt.Sprintf("Download initialize complete: %s", msg.result.Filename)
+			m.Result = msg.result
 		} else {
-			m.message = fmt.Sprintf("Error auto selecting files: %v", msg.err)
+			m.message = fmt.Sprintf("Error download init: %v", msg.err)
+
 		}
 
 		return m, tea.Quit
-
 	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
+
 		return m, cmd
 	}
+
 }
 
-func (m autoSelectTorrentModel) View() string {
+func (m unrestrictFileModel) View() string {
 	if m.Quitting {
 		return ""
 	}
@@ -129,17 +136,17 @@ func (m autoSelectTorrentModel) View() string {
 	return output
 }
 
-func AutoSelectFiles(torrentId string, rd *realdebrid.RealDebridClient) error {
-	p := tea.NewProgram(initialAutoSelectTorrent(torrentId, rd))
+func HandleUnrestrictFileLink(link string, rd *realdebrid.RealDebridClient) (*unrestrictFileModel, error) {
+	p := tea.NewProgram(initialUnrestrictFileModel(link, rd))
 	r, err := p.Run()
 	if err != nil {
-		return fmt.Errorf("Error running program: %v", err)
+		return nil, fmt.Errorf("Error running program: %v", err)
 	}
 
-	output := r.(autoSelectTorrentModel)
+	output := r.(unrestrictFileModel)
 	if output.err != nil {
-		return fmt.Errorf("Error: %v", output.err)
+		return nil, fmt.Errorf("Error: %v", output.err)
 	}
 
-	return nil
+	return &output, nil
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tbdsux/realdebrid-cli/rd/cmd/shared"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
+	"github.com/tbdsux/realdebrid-cli/rd/internal/handlers"
 	addMagnet "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/add_magnet"
-	uploadtorrent "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/upload_torrent"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
@@ -48,7 +48,7 @@ You will be asked to provide the magnet link on command usage.
 
 		rdClient := realdebrid.NewClient(apiKey)
 
-		output, err := addMagnet.HandleUploadMagnetLink(magnetLink, rdClient)
+		output, err := handlers.HandleUploadMagnetLink(magnetLink, rdClient)
 		if err != nil {
 			cmd.PrintErrf("Error: %v", err)
 			return
@@ -75,7 +75,7 @@ You will be asked to provide the magnet link on command usage.
 
 		// Do auto select and start torrent
 
-		if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
+		if err := handlers.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
 			cmd.PrintErrf("Error: %v\n", err)
 			return
 		}

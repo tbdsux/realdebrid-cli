@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tbdsux/realdebrid-cli/rd/cmd/shared"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
+	"github.com/tbdsux/realdebrid-cli/rd/internal/handlers"
 	uploadtorrent "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/upload_torrent"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
@@ -81,7 +82,7 @@ Select torrent file and upload to be downloaded later on.
 
 		// Do auto select and start torrent
 
-		if err := uploadtorrent.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
+		if err := handlers.AutoSelectFiles(output.Result.ID, rdClient); err != nil {
 			cmd.PrintErrf("Error: %v\n", err)
 			return
 		}

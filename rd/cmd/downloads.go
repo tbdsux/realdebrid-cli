@@ -7,6 +7,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
+	"github.com/tbdsux/realdebrid-cli/rd/internal/handlers"
 	showDownloads "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/show_downloads"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
@@ -73,7 +74,7 @@ automatically be downloaded, set '--no-download' otherwise.
 
 		fmt.Println("\n  Downloading ::", selected.Filename)
 
-		output, err := showDownloads.DoDownloadFile(*selected)
+		output, err := handlers.DoDownloadFile(*selected)
 		if err != nil {
 			cmd.PrintErrf("Error: %v", err)
 			return
@@ -85,11 +86,11 @@ automatically be downloaded, set '--no-download' otherwise.
 				return
 			}
 
-			fmt.Print(showDownloads.ShowFailDLMessage("Stopped download."))
+			fmt.Print(handlers.ShowFailDLMessage("Stopped download."))
 			return
 		}
 
-		fmt.Print(showDownloads.ShowSuccessDLMessage("Download success!"))
+		fmt.Print(handlers.ShowSuccessDLMessage("Download success!"))
 	},
 }
 

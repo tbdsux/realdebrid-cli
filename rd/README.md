@@ -1,8 +1,5 @@
 # realdebrid-cli
 
-> [!NOTE]
-> On-going development.
-
 Manage your real-debrid account via a cli.
 
 ```sh
@@ -39,7 +36,6 @@ Flags:
 Use "rd [command] --help" for more information about a command.
 ```
 
-
 #### Starting Use
 
 Make sure to setup your config key buy doing:
@@ -52,6 +48,7 @@ Make sure to setup your config key buy doing:
 # verify your api key
 ❯ rd config
 
+# show your account details
 ❯ rd account
 ```
 
@@ -67,6 +64,6 @@ Make sure to setup your config key buy doing:
 
 ## Development
 
-CLI uses [Bubble Tea](https://github.com/charmbracelet/bubbletea/) for power for the commands.
+CLI uses [Bubble Tea](https://github.com/charmbracelet/bubbletea/) for some power for the commands.
 
 > This is not a TUI app though.

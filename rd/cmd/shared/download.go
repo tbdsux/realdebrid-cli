@@ -7,8 +7,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 	"github.com/tbdsux/realdebrid-cli/rd/internal"
-	showDownloads "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/show_downloads"
-	showTorrents "github.com/tbdsux/realdebrid-cli/rd/internal/handlers/show_torrents"
+	"github.com/tbdsux/realdebrid-cli/rd/internal/handlers"
 	"github.com/tbdsux/realdebrid-cli/realdebrid"
 )
 
@@ -60,7 +59,7 @@ func TorrentDownload(torrent realdebrid.Torrent, rdClient *realdebrid.RealDebrid
 
 	for _, item := range torrent.Links {
 		// Unrestrict torrent file
-		unrestrict, err := showTorrents.HandleUnrestrictFileLink(item, rdClient)
+		unrestrict, err := handlers.HandleUnrestrictFileLink(item, rdClient)
 		if err != nil {
 			cmd.PrintErrf("Error: %v\n", err)
 			return
@@ -94,7 +93,7 @@ func TorrentDownload(torrent realdebrid.Torrent, rdClient *realdebrid.RealDebrid
 			finalFilename = fmt.Sprintf("%s/%s", dirPath, unrestrict.Result.Filename)
 		}
 
-		output, err := showDownloads.DoDownloadFile(realdebrid.Download{
+		output, err := handlers.DoDownloadFile(realdebrid.Download{
 			ID:       unrestrict.Result.ID,
 			Filename: finalFilename,
 			Download: unrestrict.Result.Download,
@@ -110,10 +109,10 @@ func TorrentDownload(torrent realdebrid.Torrent, rdClient *realdebrid.RealDebrid
 				return
 			}
 
-			fmt.Print(showDownloads.ShowFailDLMessage("Stopped download."))
+			fmt.Print(handlers.ShowFailDLMessage("Stopped download."))
 			return
 		}
 
-		fmt.Print(showDownloads.ShowSuccessDLMessage("Download success!"))
+		fmt.Print(handlers.ShowSuccessDLMessage("Download success!"))
 	}
 }
