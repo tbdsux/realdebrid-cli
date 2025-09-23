@@ -45,4 +45,4 @@ jobs:
       - name: Build CLI binary
         run: go build -o rd-test ./rd/main.go
       - name: Verify CLI binary
-        run: ./rd-test
+        run: ./rd-test version
