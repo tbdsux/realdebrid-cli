@@ -61,13 +61,22 @@ func (m showModel) View() string {
 	return docStyle.Render(m.list.View())
 }
 
+func formatListDesc(i realdebrid.Torrent) string {
+	if i.Status == "downloaded" {
+		return fmt.Sprintf("ID: %s\tSize: %s", i.ID, internal.ByteCountSI(i.Bytes))
+
+	}
+
+	return fmt.Sprintf("ID: %s\tSize: %s\t Status: %s \tProgress: %.2f%%", i.ID, internal.ByteCountSI(i.Bytes), i.Status, i.Progress)
+}
+
 func ShowTorrentsList(dls []realdebrid.Torrent, page int) (*realdebrid.Torrent, error) {
 	var items []list.Item
 
 	for _, i := range dls {
 		items = append(items, item{
 			title: i.Filename,
-			desc:  fmt.Sprintf("ID: %s\tSize: %s\t", i.ID, internal.ByteCountSI(i.Bytes)),
+			desc:  formatListDesc(i),
 			id:    i.ID,
 		})
 	}
