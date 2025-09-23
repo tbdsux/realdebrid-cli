@@ -34,12 +34,12 @@ func (m showModel) Init() tea.Cmd {
 func (m showModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.Type {
-		case tea.KeyCtrlC:
+		switch msg.String() {
+		case tea.KeyCtrlC.String(), "q":
 			m.IsQuitting = true
 			return m, tea.Quit
 
-		case tea.KeyEnter:
+		case tea.KeyEnter.String():
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.Choice = i
