@@ -97,9 +97,26 @@ func getTorrentInfo(rd *realdebrid.RealDebridClient, id string) {
 	}
 }
 
+func getLatest10Torrents(rd *realdebrid.RealDebridClient) {
+	// === GET LATEST 10 TORRENTS
+	res, err := rd.GetTorrents(&realdebrid.GetTorrentsRequest{
+		Limit: 10,
+	})
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, torrent := range res {
+		fmt.Printf("Torrent ID: %s, Name: %s, Status: %s, Progress: %.2f%%\n", torrent.ID, torrent.Filename, torrent.Status, torrent.Progress)
+	}
+}
+
 // UNCOMMENT SOME OF THE FUNCTIONS BELOW TO TEST THEM
 func main() {
 	rd := realdebrid.NewClient(os.Getenv("REALDEBRID_API_KEY"))
+
+	getLatest10Torrents(rd)
 
 	getTorrentInfo(rd, "W6Z5SYI5JG3ZA")
 

@@ -21,17 +21,22 @@ type GetDownloadRequest struct {
 }
 
 // GetDownloads gets the user's downloads list.
+// Defaults: offset=0, limit=10, page=1
 // `GET /downloads`
 func (c *RealDebridClient) GetDownloads(req *GetDownloadRequest) ([]Download, error) {
+	params := map[string]string{
+		"offset": "0",
+		"limit":  "10",
+		"page":   "1",
+	}
 
-	params := make(map[string]string)
-	if req.Offset != 0 {
+	if req != nil && req.Offset != 0 {
 		params["offset"] = fmt.Sprint(req.Offset)
 	}
-	if req.Limit != 0 {
+	if req != nil && req.Limit != 0 {
 		params["limit"] = fmt.Sprint(req.Limit)
 	}
-	if req.Page != 0 {
+	if req != nil && req.Page != 0 {
 		params["page"] = fmt.Sprint(req.Page)
 	}
 

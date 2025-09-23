@@ -15,7 +15,7 @@ type Torrent struct {
 	Bytes    int64    `json:"bytes"`
 	Host     string   `json:"host"`
 	Split    int64    `json:"split"`
-	Progress int64    `json:"progress"`
+	Progress float64  `json:"progress"`
 	Status   string   `json:"status"`
 	Added    string   `json:"added"`
 	Links    []string `json:"links"`
@@ -44,21 +44,26 @@ type GetTorrentsRequest struct {
 }
 
 // GetTorrents retrieves the list of torrents of the user.
+// Defaults: filter=active, offset=0, limit=10, page=1
 // `GET /torrents`
 func (c *RealDebridClient) GetTorrents(req *GetTorrentsRequest) ([]Torrent, error) {
 	params := map[string]string{
 		"filter": "active",
+		"offset": "0",
+		"limit":  "10",
+		"page":   "1",
 	}
-	if req.Offset != 0 {
+
+	if req != nil && req.Offset != 0 {
 		params["offset"] = fmt.Sprint(req.Offset)
 	}
-	if req.Limit != 0 {
+	if req != nil && req.Limit != 0 {
 		params["limit"] = fmt.Sprint(req.Limit)
 	}
-	if req.Page != 0 {
+	if req != nil && req.Page != 0 {
 		params["page"] = fmt.Sprint(req.Page)
 	}
-	if req.Filter != "" {
+	if req != nil && req.Filter != "" {
 		params["filter"] = req.Filter
 	}
 
