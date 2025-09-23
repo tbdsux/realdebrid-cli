@@ -32,10 +32,11 @@ type TrafficDetails = map[string]struct {
 }
 
 // GetTrafficDetails retrieves detailed traffic information on each hoster during a specified period.
-// The `start` and `end` parameters should be in ISO 8601 format (e.g., "2023-01-01T00:00:00Z").
+// The `start` and `end` parameters should be in ISO 8601 format (e.g., "2023-01-01").
+// Note: Currently returns empty [], to be fixed later on.
 // `GET /traffic/details`
-func (c *RealDebridClient) GetTrafficDetails(start string, end string) (*TrafficDetails, error) {
-	var trd TrafficDetails
+func (c *RealDebridClient) GetTrafficDetails(start string, end string) ([]TrafficDetails, error) {
+	var trd []TrafficDetails
 	resp, err := c.client.R().SetSuccessResult(&trd).SetQueryParam("start", start).SetQueryParam("end", end).Get("traffic/details")
 	if err != nil {
 		return nil, err
@@ -45,5 +46,5 @@ func (c *RealDebridClient) GetTrafficDetails(start string, end string) (*Traffic
 		return nil, resp.Err
 	}
 
-	return &trd, nil
+	return trd, nil
 }
