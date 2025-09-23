@@ -60,7 +60,7 @@ Make sure to setup your config key buy doing:
 
 > OUTPUT:
 >
-> ![](../docs/usage1.png)
+> ![](./docs/usage1.png)
 
 ## Development
 
